@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kosmo.alone.mapper.MinSangMapper">
+	
+	<resultMap id="MonSessionMap" type="com.kosmo.alone.vo.MonstersVO" autoMapping="true">
+		<result property="monPk" column="mon_pk" />
+		<result property="monToken" column="mon_token" />
+		<result property="monActivate" column="mon_activate" />
+		<result property="monProfile" column="mon_profile" />
+		<result property="monLoveball" column="mon_loveball" />
+		<result property="monName" column="mon_name" />
+	</resultMap>
+	
+	<resultMap id="DesListMap" type="com.kosmo.alone.vo.DestinationVO" autoMapping="true">
+		<result property="monPk" column="mon_pk" />
+		<result property="desPk" column="des_pk" />
+		<result property="desName" column="des_name" />
+		<result property="desLat" column="des_lat" />
+		<result property="desLng" column="des_lng" />
+		<result property="desDateIn" column="des_date_in" />
+		<result property="desRegdate" column="des_regdate" />
+		<result property="desDateOut" column="des_date_out" />
+		<result property="desId" column="des_id" />
+	</resultMap>
+	
+	
+	<insert id="monInsert">
+		insert into monsters 
+		values (mon_pk.nextval, #{monName}, #{monEmail}, #{monBirthday}, #{monSex}, #{monTel}, 1, 0, sysdate, #{monProfile}, 10, #{monIntro}, #{monToken}, #{monId})
+	</insert>
+	
+	<select id="monSelect" parameterType="map" resultMap="MonSessionMap">
+		select mon_pk,mon_token,mon_activate, mon_profile, mon_loveball, mon_name  from monsters where mon_email=#{monEmail} and mon_id=#{monId}
+	</select>
+	
+	<insert id="desInsert"> 
+		insert into destination
+		values (des_pk.nextval, #{monPk}, #{desName}, #{desLat}, #{desLng}, to_date(#{desDateIn}, 'yyyy/mm/dd'), sysdate, to_date(#{desDateOut}, 'yyyy/mm/dd'), #{desId})
+	</insert>
+	
+	<select id="desList" parameterType="map" resultMap="DesListMap">
+		select * from destination where mon_pk=#{monPk} order by des_regdate desc
+	</select>
+	
+	<select id="desDetail" parameterType="map" resultMap="DesListMap">
+		select * from destination where des_pk=#{desPk}
+	</select>
+	
+	<select id="desNewPk" parameterType="map" resultType="int">
+		select des_pk as desPk from(select * from destination where mon_pk=#{monPk} order by des_regdate desc) where rownum=1
+	</select>
+	<!-- Current Location -->
+	<insert id="insertCurrent" parameterType="com.kosmo.alone.vo.CurrentLocVO">
+	   insert into current_loc(cur_pk, mon_pk, cur_lat, cur_lng, cur_regdate, cur_ison)
+	   values (cur_pk.nextval, #{monPk}, #{curLat}, #{curLng}, sysdate, 1)
+	</insert>
+	<!-- 계정 비활성화 -->
+	<update id="disabledMon">
+		update monsters set mon_activate=0 where mon_pk=#{monPk}
+	</update>
+</mapper>
+
+
+

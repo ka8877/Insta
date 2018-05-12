@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kosmo.alone.mapper.ImGuMapper">
+	
+<resultMap id="monstersMap" type="com.kosmo.alone.vo.MonstersVO">
+	<result property="monPk" column="mon_pk" />
+	<result property="monName" column="mon_name" />
+	<result property="monEmail" column="mon_email" />
+	<result property="monBirthday" column="mon_birthday" />
+	<result property="monSex" column="mon_sex" />
+	<result property="monTel" column="mon_tel" />
+	<result property="monActivate" column="mon_activate" />
+	<result property="monCharged" column="mon_charged" />
+	<result property="monRegdate" column="mon_regdate" />
+	<result property="monProfile" column="mon_profile" />
+	<result property="monLoveball" column="mon_loveball" />
+	<result property="monIntro" column="mon_intro" />
+	<result property="monToken" column="mon_token" />
+</resultMap>
+
+<resultMap id="galleryMap" type="com.kosmo.alone.vo.GalleryVO">
+	<result property="galPk" column="gal_pk" />
+	<result property="monPk" column="mon_pk" />
+	<result property="galUrl" column="gal_url" />
+	<result property="galRegdate" column="gal_regdate" />
+
+</resultMap>
+
+<resultMap id="paymentsMap" type="com.kosmo.alone.vo.PaymentsVO">
+	<result property="monPk" column="mon_pk" />
+	<result property="proPk" column="pro_pk" />
+	<result property="payPk" column="pay_pk" />
+	<result property="payRegdate" column="pay_regdate" />
+</resultMap>
+
+<resultMap id="productsMap" type="com.kosmo.alone.vo.ProductsVO">
+	<result property="proPk" column="pro_pk" />
+	<result property="proName" column="pro_name" />
+	<result property="proDetail" column="pro_detail" />
+	<result property="proPrice" column="pro_price" />
+	<result property="proRegdate" column="pro_regdate" />
+</resultMap>
+
+<resultMap id="likesMap" type="com.kosmo.alone.vo.LikesVO">
+	<result property="likePk" column="like_pk" />
+	<result property="likeObject" column="like_object" />
+	<result property="likeRegdate" column="like_regdate" />
+</resultMap>
+
+
+<resultMap type="com.kosmo.alone.vo.MonstersVO" id="lmMap" >	
+	<result property="monName" column="mon_name" />
+	<collection property="likeList" javaType="java.util.ArrayList"  resultMap="likesMap"/>
+ </resultMap>
+ 
+ <select id="likeList" resultType="com.kosmo.alone.vo.LikesVO">	
+select monpk,monname,likepk,likeregdate,rnum from
+(select monpk,monname,likepk,likeregdate,rownum rnum from
+(select m.mon_pk as monpk,m.mon_name as monname ,count(l.like_pk) as likepk, to_char(l.like_regdate,'yyyy/mm/dd') as likeregdate from likes l,monsters m  
+where m.mon_pk=l.mon_pk and m.mon_pk=#{monPk} group by m.mon_pk,l.like_pk,l.like_regdate,m.mon_name order by l.like_regdate desc) t) 
+where rnum <![CDATA[>=]]> #{sseq} and rnum <![CDATA[<=]]> #{eseq}
+</select>
+
+<select id="likesCount" resultType="Integer">
+select count(*) from 
+(select m.mon_pk as monpk,m.mon_name as monname ,count(l.like_pk) as likepk, l.like_regdate as likeregdate from likes l,monsters m  
+where m.mon_pk=l.mon_pk and m.mon_pk=#{monPk} group by m.mon_pk,l.like_pk,l.like_regdate,m.mon_name order by l.like_regdate desc) t 
+</select>
+
+ <select id="paymentsList" resultType="com.kosmo.alone.vo.ProductsVO">
+ select monname,proname,prodetail,proprice,payregdate,rnum from
+(select monname,proname,prodetail,proprice,payregdate,rownum rnum from
+(select m.mon_name as monname,p.pro_name as proname,p.pro_detail as prodetail ,p.pro_price as proprice,
+to_char(y.pay_regdate,'yyyy/mm/dd') as payregdate from monsters m,products p,payments y where m.mon_pk=y.mon_pk and y.pro_pk=p.pro_pk and m.mon_pk=#{monPk} order by y.pay_regdate desc) t )
+where rnum <![CDATA[>=]]> #{sseq} and rnum <![CDATA[<=]]> #{eseq}
+</select>
+
+<select id="paymentsCount" resultType="Integer">
+select count(*) from 
+(select m.mon_name,p.pro_name,p.pro_detail,p.pro_price,
+y.pay_regdate from monsters m,products p,payments y where m.mon_pk=y.mon_pk and y.pro_pk=p.pro_pk and m.mon_pk=#{monPk} order by y.pay_regdate desc) t
+</select>
+
+<select id="monsterDetail"
+	parameterType="map" resultMap="monstersMap">
+	
+	select mon_pk,mon_name,mon_email,mon_sex,mon_token,mon_intro,mon_tel,mon_birthday,mon_loveball from monsters where mon_pk=#{monPk}
+</select>
+
+<update id="monstersUpdate" >
+update monsters set mon_email=#{monEmail},mon_birthday=#{monBirthday},
+mon_tel=#{monTel},mon_intro=#{monIntro},mon_sex=#{monSex} where mon_pk=#{monPk}
+</update>
+
+<select id="profileDetail" parameterType="map" resultMap="monstersMap">
+select NVL(mon_profile,'300x300.png') mon_profile from monsters where mon_pk=#{monPk}
+</select>
+
+
+<update id="profileUpdate">
+update monsters set mon_profile=#{monProfile} where mon_pk=#{monPk}
+</update>
+
+<update id="profileDelete">
+update monsters set mon_profile='300x300.png' where mon_pk=#{monPk}
+</update>
+
+<update id="monsterDeactivate">
+update monsters set mon_activate='0' where mon_pk=#{monPk}
+</update>
+
+<update id="monsterActivate">
+update monsters set mon_activate='1' where mon_pk=#{monPk} and mon_token=#{monToken} 
+</update>
+
+
+<select id="galleryList"  resultMap="galleryMap">
+select gal_pk,gal_url,gal_regdate, rnum from 
+(select  gal_pk,gal_url,gal_regdate, rownum rnum from
+(select gal_pk,gal_url,gal_regdate from gallery where mon_pk=#{monPk} order by gal_regdate desc) t)
+where rnum <![CDATA[>=]]> #{sseq} and rnum <![CDATA[<=]]> #{eseq}
+</select>
+
+<select id="galleryCount"
+	resultType="Integer">
+		select count(*) totalCount from gallery where mon_pk=#{monPk}
+	</select>
+
+
+
+<insert id="galleryInsert">
+insert into gallery(gal_pk,gal_url,mon_pk,gal_regdate) values(gal_pk.nextval,#{galUrl},#{monPk},sysdate)
+</insert>
+
+<delete id="galleryDelete">
+delete from gallery where gal_pk=${galPk}
+</delete>
+
+<select id="ballCount" resultType="Integer">
+select mon_loveball from monsters where mon_pk=#{monPk}
+</select>
+</mapper>

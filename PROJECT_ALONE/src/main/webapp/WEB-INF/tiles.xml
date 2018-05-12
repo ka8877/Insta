@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- <!DOCTYPE  tiles-definitions PUBLIC
+	"-//Aapche Software Foundation//DTD Tiles Configuration 2.0//EN"
+	"http://tiles.apache.org/dtds/tiles-config_2_1.dtd"
+>
+
+ -->
+<!DOCTYPE tiles-definitions PUBLIC
+"-//Apache Soft Foundation//DTD Tiles Configuration 3.0//EN"
+"http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+
+<tiles-definitions>
+	<definition name="alone" template="/tiles/layout.jsp">
+		<put-attribute name="title" value="Alone Project"/>
+		<put-attribute name="top" value = "/tiles/top.jsp"/>
+		<put-attribute name="body" value = ""/>
+		<put-attribute name="footer" value = "/tiles/footer.jsp"/>
+	</definition>
+	
+	<definition name="alone/alone_*" extends="alone" >
+		<put-attribute name="body" value = "/alone/alone_{1}.jsp"/>
+	</definition>
+	
+	<definition name="alone/calendar/alone_*" extends="alone" >
+		<put-attribute name="body" value = "/alone/calendar/alone_{1}.jsp"/>
+	</definition>
+	
+	<definition name="alone/community/alone_*" extends="alone" >
+		<put-attribute name="body" value = "/alone/community/alone_{1}.jsp"/>
+	</definition>
+	
+	<definition name="alone/home/alone_*" extends="alone" >
+		<put-attribute name="body" value = "/alone/home/alone_{1}.jsp"/>
+	</definition>
+	
+	<definition name="alone/information/alone_*" extends="alone" >
+		<put-attribute name="body" value = "/alone/information/alone_{1}.jsp"/>
+	</definition>
+	
+		<definition name="alone/login/alone_*" extends="alone" >
+		<put-attribute name="body" value = "/alone/login/alone_{1}.jsp"/>
+	</definition>
+	
+		<definition name="alone/recommendation/alone_*" extends="alone" >
+		<put-attribute name="body" value = "/alone/recommendation/alone_{1}.jsp"/>
+	</definition>
+	
+	<definition name="alone/scrap/alone_*" extends="alone" >
+		<put-attribute name="body" value = "/alone/scrap/alone_{1}.jsp"/>
+	</definition>
+	
+</tiles-definitions>

@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kosmo.alone.mapper.KangMapper">
+
+	<resultMap type="com.kosmo.alone.vo.BoardsVO" id="BoardsMap">
+		<result property="monPk" column="mon_Pk" />
+		<result property="catePk" column="cate_Pk" />
+		<result property="boaPk" column="boa_Pk" />
+		<result property="boaTitle" column="boa_Title" />
+		<result property="boaCon" column="boa_Con"  javaType="java.lang.String"  jdbcType="CLOB" />
+		<result property="boaRegdate" column="boa_Regdate" />
+		<result property="boaUrl" column="boa_Url" />
+		<result property="cateName" column="cate_Name" />
+		<result property="boaGubun" column="boa_Gubun" />
+		<result property="monName" column="mon_name" />
+	</resultMap>
+
+	<resultMap type="com.kosmo.alone.vo.CategoriesVO" id="CategoryMap">
+		<result property="catePk" column="cate_Pk" />
+		<result property="cateName" column="cate_Name" />
+		<result property="cateRegdate" column="cate_Regdate" />
+		<result property="cateGubun" column="cate_Gubun" />
+	</resultMap>
+
+	<resultMap type="com.kosmo.alone.vo.ReplyVO" id="boardsReplyMap">
+		<result property="boaPk" column="boa_Pk" />
+		<result property="monPk" column="mon_Pk" />
+		<result property="repPk" column="rep_Pk" />
+		<result property="repCon" column="rep_Con" />
+		<result property="repRegdate" column="rep_Regdate" />
+		<result property="monName" column="mon_Name" />
+	</resultMap>
+
+	<resultMap type="com.kosmo.alone.vo.BoardScrapVO" id="boardsScrapMap">
+		<result property="boaPk" column="boa_Pk" />
+		<result property="monPk" column="mon_Pk" />
+		<result property="boaScrPk" column="boa_Scr_Pk" />
+		<result property="boaScrRegdate" column="boa_Scr_Regdate" />
+	</resultMap>
+	
+	<resultMap type="com.kosmo.alone.vo.MonstersVO" id="MonMap">
+		<result property="monPk" column="mon_Pk" />
+		<result property="monName" column="mon_Name" />
+		<result property="monEmail" column="mon_Email" />
+		<result property="monProfile" column="mon_Profile" />
+		<result property="monLoveball" column="mon_Loveball" />
+	</resultMap>
+
+	<select id="categoryList" resultMap="CategoryMap">
+		select cate_pk, cate_name,
+		cate_regdate, cate_gubun from categories where cate_gubun=#{cateGubun}
+	</select>
+
+	<select id="cateBoardsAllList" resultMap="BoardsMap">
+		select rnum, mon_pk, cate_pk, boa_pk, boa_title, boa_con, boa_regdate,
+		boa_url, cate_name, cate_regdate
+		from
+		(
+		select rownum rnum, mon_pk,
+		cate_pk, boa_pk, boa_title, boa_con,
+		boa_regdate, boa_url, cate_name,
+		cate_regdate
+		from
+		(select b.mon_pk, b.cate_pk, b.boa_pk, b.boa_title,
+		b.boa_con, b.boa_regdate,
+		b.boa_url, c.cate_name, c.cate_regdate from
+		boards b, categories c
+		where b.cate_pk=c.cate_pk and b.cate_pk =
+		#{catePk} order by b.boa_regdate
+		desc)t
+		)
+		where rnum <![CDATA[>=]]>#{sseq}
+		and rnum <![CDATA[<=]]>#{eseq}
+	</select>
+
+	<select id="boardsRcntList" resultMap="BoardsMap">
+		select rnum, boa_pk, cate_pk, boa_title, boa_regdate,
+		boa_url,
+		mon_name, rcnt, cate_name
+		from
+		(
+		select rownum rnum, boa_pk, cate_pk,
+		boa_title, boa_regdate,
+		boa_url, mon_name, rcnt, cate_name
+		from
+		boards_rcnt t where cate_Pk=#{catePk}
+		)
+		where rnum <![CDATA[>=]]>#{sseq}
+		and rnum <![CDATA[<=]]>#{eseq}
+	</select>
+
+	<select id="boardsScntList" resultMap="BoardsMap">
+		select rnum, boa_pk, cate_pk, boa_title, boa_regdate,
+		boa_url,
+		mon_name, scnt, cate_name
+		from
+		(
+		select rownum rnum, boa_pk, cate_pk,
+		boa_title, boa_regdate,
+		boa_url, mon_name, scnt, cate_name
+		from
+		boards_scnt t where cate_Pk=#{catePk}
+		)
+		where rnum <![CDATA[>=]]>#{sseq}
+		and rnum <![CDATA[<=]]>#{eseq}
+	</select>
+
+	<select id="boardsAllCount" resultType="int">
+		select count(*) as cnt
+		from
+		boards where cate_Pk=#{catePk}
+	</select>
+
+	<select id="cateBoardsBestList" resultMap="BoardsMap">
+		select rnum, mon_pk, cate_pk, boa_pk, boa_title, boa_con, boa_regdate,
+		boa_url, boa_gubun, cate_name, cate_regdate
+		from
+		(
+		select rownum rnum,
+		mon_pk, cate_pk, boa_pk, boa_title, boa_con,
+		boa_regdate, boa_url,
+		boa_gubun, cate_name, cate_regdate
+		from
+		(select b.mon_pk, b.cate_pk,
+		b.boa_pk, b.boa_title, b.boa_con, b.boa_regdate,
+		b.boa_url,
+		b.boa_gubun, c.cate_name, c.cate_regdate from boards b, categories c
+		where b.cate_pk=c.cate_pk and b.cate_pk = #{catePk} and
+		b.boa_gubun=#{boaGubun} order by b.boa_regdate
+		desc)t
+		)
+		where rnum <![CDATA[>=]]>#{sseq}
+		and rnum <![CDATA[<=]]>#{eseq}
+	</select>
+
+	<select id="boardsScntBestList" resultMap="BoardsMap">
+		select rnum, boa_pk, cate_pk, boa_title, boa_regdate,
+		boa_url,
+		mon_name, scnt, boa_gubun, cate_name
+		from
+		(
+		select rownum rnum, boa_pk,
+		cate_pk, boa_title, boa_regdate,
+		boa_url, mon_name, scnt, boa_gubun,
+		cate_name
+		from
+		boards_scnt where boa_gubun=#{boaGubun} and cate_Pk=#{catePk}
+		)
+		where rnum <![CDATA[>=]]>#{sseq}
+		and rnum <![CDATA[<=]]>#{eseq}
+	</select>
+
+	<select id="boardsRcntBestList" resultMap="BoardsMap">
+		select rnum, boa_pk, cate_pk, boa_title, boa_regdate,
+		boa_url,
+		mon_name, rcnt, boa_gubun, cate_name
+		from
+		(
+		select rownum rnum, boa_pk,
+		cate_pk, boa_title, boa_regdate,
+		boa_url, mon_name, rcnt, boa_gubun,
+		cate_name
+		from
+		boards_rcnt where boa_gubun=#{boaGubun} and cate_Pk=#{catePk}
+		)
+		where rnum <![CDATA[>=]]>#{sseq}
+		and rnum <![CDATA[<=]]>#{eseq}
+	</select>
+
+	<select id="boardsBestCount" resultType="int">
+		select count(*) as cnt
+		from
+		boards
+		where boa_gubun=#{boaGubun} and cate_Pk=#{catePk}
+	</select>
+
+	<insert id="boardsInsert">
+	    insert into boards(mon_pk, cate_pk, boa_pk,
+		boa_title, boa_regdate, boa_url, boa_gubun, boa_con)
+		values(#{monPk},#{catePk},boa_pk.nextval,#{boaTitle},sysdate,#{boaUrl},#{boaGubun} ,#{boaCon, jdbcType=CLOB})
+	</insert>  
+
+	<update id="boardsUpdate">
+		update boards set boa_title=#{boaTitle}, boa_con=#{boaCon, jdbcType=CLOB},
+		boa_url=#{boaUrl}, boa_gubun=#{boaGubun}, boa_regdate=sysdate where
+		boa_Pk = #{boaPk}
+	</update>
+
+	<delete id="boardsDelete">
+		delete from boards where boa_pk=#{boaPk}
+	</delete>
+
+	<select id="boardsDetail" resultType="com.kosmo.alone.vo.BoardsVO"
+		resultMap="BoardsMap">
+		select b.mon_pk,
+		b.cate_pk, b.boa_pk, b.boa_title, b.boa_con,
+		b.boa_regdate, b.boa_url,
+		b.boa_gubun, c.cate_name, c.cate_regdate, m.mon_name from
+		boards b, categories c, monsters m
+		where b.cate_pk=c.cate_pk and m.mon_pk=b.mon_pk and boa_pk=#{boaPk}
+	</select>
+
+	<select id="boardsFirstRegdate" resultType="com.kosmo.alone.vo.BoardsVO"
+		resultMap="BoardsMap">
+		select mon_pk, boa_pk,cate_pk, boa_con, boa_title, boa_url,
+		boa_gubun, boa_regdate from boards where boa_regdate = (select
+		max(boa_regdate) from boards)
+	</select>
+
+	<select id="boardsSearchAll" resultMap="BoardsMap">
+		select rnum, mon_pk, cate_pk, boa_pk, boa_title, boa_con, boa_regdate,
+		boa_url, boa_gubun, cate_name, cate_regdate
+		from
+		(
+		select rownum rnum,
+		mon_pk, cate_pk, boa_pk, boa_title, boa_con,
+		boa_regdate, boa_url,
+		boa_gubun, cate_name, cate_regdate
+		from
+		(select b.mon_pk, b.cate_pk,
+		b.boa_pk, b.boa_title, b.boa_con, b.boa_regdate,
+		b.boa_url,
+		b.boa_gubun, c.cate_name, c.cate_regdate from boards b, categories c
+		where b.cate_pk=c.cate_pk and b.cate_pk = #{catePk} and (boa_title
+		like '%'||#{boaTitle}||'%')
+		order by b.boa_regdate
+		desc)t
+		)
+		where rnum <![CDATA[>=]]>#{sseq}
+		and rnum <![CDATA[<=]]>#{eseq}
+	</select>
+
+	<select id="boardsSearchGubun" resultMap="BoardsMap">
+		select rnum, mon_pk, cate_pk, boa_pk, boa_title, boa_con, boa_regdate,
+		boa_url, boa_gubun, cate_name, cate_regdate
+		from
+		(
+		select rownum rnum,
+		mon_pk, cate_pk, boa_pk, boa_title, boa_con,
+		boa_regdate, boa_url,
+		boa_gubun, cate_name, cate_regdate
+		from
+		(select b.mon_pk, b.cate_pk,
+		b.boa_pk, b.boa_title, b.boa_con, b.boa_regdate,
+		b.boa_url,
+		b.boa_gubun, c.cate_name, c.cate_regdate from boards b, categories c
+		where b.cate_pk=c.cate_pk and b.cate_pk = #{catePk} and
+		b.boa_gubun=#{boaGubun} and (boa_title like '%'||#{boaTitle}||'%')
+		order by b.boa_regdate
+		desc)t
+		)
+		where rnum <![CDATA[>=]]>#{sseq}
+		and rnum <![CDATA[<=]]>#{eseq}
+	</select>
+
+	<select id="boardsSearchAllCount" resultType="int">
+		select count(*) as
+		cnt from boards where boa_title like 
+		'%'||#{boaTitle}||'%' and cate_Pk=#{catePk}
+	</select>
+
+	<select id="boardsSearchGubunCount" resultType="int">
+		select count(*)
+		as cnt from boards where boa_title like '%'||#{boaTitle}||'%' and
+		boa_gubun=#{boaGubun} and cate_Pk=#{catePk}
+	</select>
+
+	<select id="boardsReplyList" resultMap="boardsReplyMap">
+		select
+		r.boa_pk,r.mon_pk,r.rep_pk,r.rep_con,r.rep_regdate,m.mon_name,m.mon_profile from reply r, monsters m where
+		m.mon_pk=r.mon_pk and boa_pk=#{boaPk} order by rep_regdate asc
+	</select>
+
+	<insert id="boardsReplyInsert">
+		insert into
+		reply(boa_pk,mon_pk,rep_pk,rep_con,rep_regdate)
+		values(#{boaPk},#{monPk},rep_pk.nextval,#{repCon},sysdate)
+	</insert>
+
+	<delete id="boardsReplyDelete">
+		delete from reply where rep_pk = #{repPk}
+	</delete>
+
+	<select id="boardsScrapSelect" resultMap="boardsScrapMap">
+		select
+		boa_pk,mon_pk,boa_scr_pk,boa_scr_regdate from board_scrap where
+		mon_Pk=#{monPk} and boa_pk=#{boaPk}
+	</select>
+
+	<insert id="boardsScrapInsert">
+		insert into
+		board_scrap(boa_pk,mon_pk,boa_scr_pk,boa_scr_regdate)
+		values(#{boaPk},#{monPk},boa_scr_pk.nextval,sysdate)
+	</insert>
+
+	<delete id="boardsScrapDelete">
+		delete from board_scrap where mon_pk=#{monPk} and
+		boa_pk=#{boaPk}
+	</delete>
+
+	<select id="boardsScrapCount" resultType="int">
+		select count(*) as cnt
+		from board_scrap where boa_pk=#{boaPk} 
+	</select>
+
+	<select id="boardsReplyCount" resultType="int">
+		select count(*) as cnt
+		from reply where boa_pk=#{boaPk}
+	</select>
+	
+	<select id="selectCateName" resultMap="CategoryMap">
+		select cate_pk, cate_name,cate_regdate,cate_gubun from categories where cate_pk=#{catePk}
+	</select>
+	
+	<select id="boardScrapList" resultMap="BoardsMap">
+				select rnum, mon_pk, cate_pk, boa_pk, boa_title, boa_con, boa_regdate,
+		boa_url, cate_name, cate_regdate, boa_gubun
+		from
+		(
+		select rownum rnum, mon_pk,
+		cate_pk, boa_pk, boa_title, boa_con,
+		boa_regdate, boa_url, cate_name,
+		cate_regdate, boa_gubun
+		from
+		(select b.mon_pk, b.cate_pk, b.boa_pk, b.boa_title,
+		b.boa_con, b.boa_regdate, b.boa_gubun,
+		b.boa_url, c.cate_name, c.cate_regdate from
+		boards b, categories c, board_scrap s
+		where b.cate_pk=c.cate_pk and s.boa_pk=b.boa_pk and s.mon_pk=#{monPk} order by b.boa_regdate
+		desc)t
+		)
+		where rnum <![CDATA[>=]]>#{sseq}
+		and rnum <![CDATA[<=]]>#{eseq}
+	</select>
+	
+	<select id="myBoardScrapCount" resultType="int">
+		 select count(*) from board_scrap where mon_pk=#{monPk}
+	</select>
+	
+	<select id="selectMember" resultMap="MonMap">
+		  select mon_pk, mon_name, mon_email, mon_profile, mon_loveball from monsters where mon_pk=#{monPk}
+	</select>
+
+</mapper>

@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kosmo.alone.mapper.DongWooMapper">
+
+	<resultMap type="com.kosmo.alone.vo.HotspotsVO" id="hotspotsMap">
+		<result property="hotPk" column="hot_pk" />
+		<result property="hotCateSeq" column="hot_cate_seq" />
+		<result property="hotName" column="hot_name" />
+		<result property="hotDetail" column="hot_detail" />	
+		<result property="hotOpen" column="hot_open" />
+		<result property="hotAddr" column="hot_addr" />		
+		<result property="hotTel" column="hot_tel" />
+		<result property="hotLat" column="hot_lat" />
+		<result property="hotLng" column="hot_lng" />
+		<result property="hotRegdate" column="hot_regdate" />
+		<result property="hotIson" column="hot_ison" />
+		<result property="hotCity" column="hot_city" />
+		<result property="hotPlaceId" column="hot_placeid" />
+				
+	</resultMap>
+	
+	
+	<resultMap type="com.kosmo.alone.vo.HotCategoriesVO" id="hotCategoriesMap">
+		<result property="hotCateSeq" column="hot_cate_seq" />
+		<result property="hotCateName" column="hot_cate_name" />
+	</resultMap>
+	
+	<resultMap type="com.kosmo.alone.vo.HotScrapsVO" id="hotScrapsMap">
+		<result property="hotScrPk" column="hot_scr_pk" />
+		<result property="monPk" column="mon_pk" />
+		<result property="hotCateSeq" column="hot_cate_seq" />
+		<result property="hotScrRegdate" column="hot_scr_regdate" />
+	
+	</resultMap>
+
+	<resultMap type="com.kosmo.alone.vo.HotPicsVO" id="hotPicsMap">
+		<result property="hotPicPk" column="hot_pic_pk" />
+		<result property="hotCateSeq" column="hot_cate_seq" />
+		<result property="hotPicUrl" column="hot_pic_url" />
+		<result property="hotPicRegdate" column="hot_pic_regdate" />
+		<result property="hotPicIsmain" column="hot_pic_ismain" />
+		<result property="hotPk" column="hot_pk" />
+	</resultMap>
+	
+	<resultMap type="com.kosmo.alone.vo.HotReviewsVO" id="hotReviewsMap">
+		<result property="monPk" column="mon_pk" />
+		<result property="hotPk" column="hot_pk" />
+		<result property="hotRevPk" column="hot_rev_pk" />
+		<result property="hotRevCon" column="hot_rev_con" />
+		<result property="hotRevServiceRating" column="hot_rev_service_rating" />
+		<result property="hotRevRegdate" column="hot_rev_regdate" />
+		<result property="hotCostRating" column="hot_cost_rating" />
+		<result property="monName" column="mon_name" />
+		<result property="monProfile" column="mon_profile" />
+	</resultMap>
+	
+	 <resultMap type="hashMap"  id="customMap">
+        <result javaType="java.lang.Integer" property="costCnt5" column="cost_cnt5" />
+		<result javaType="java.lang.Integer" property="costCnt4" column="cost_cnt4" />
+		<result javaType="java.lang.Integer" property="costCnt3" column="cost_cnt3" />
+		<result javaType="java.lang.Integer" property="costCnt2" column="cost_cnt2" />
+		<result javaType="java.lang.Integer" property="costCnt1" column="cost_cnt1" />
+       </resultMap>
+
+	<resultMap type="com.kosmo.alone.vo.MonstersVO" id="MonstersMap">
+		<result property="monPk" column="mon_pk" />
+		<result property="monName" column="mon_name" />
+		<result property="monEmail" column="mon_email" />
+		<result property="monBirthday" column="mon_birthday" />
+		<result property="monSex" column="mon_sex" />
+		<result property="monTel" column="mon_tel" />
+		<result property="monActivate" column="mon_activate" />
+		<result property="monCharged" column="mon_charged" />
+		<result property="monRegdate" column="mon_regdate" />
+		<result property="monProfile" column="mon_profile" />
+		<result property="monLoveball" column="mon_loveball" />
+		<result property="monIntro" column="mon_intro" />
+		<result property="monToken" column="mon_token" />
+		<result property="monId" column="mon_id" />
+	</resultMap>
+
+
+
+	<resultMap type="com.kosmo.alone.vo.HotspotsVO" id="hotspotsListMap">
+		<!-- hotspots -->
+		<result property="hotPk" column="hot_pk" />
+		<result property="hotCateSeq" column="hot_cate_seq" />
+		<result property="hotName" column="hot_name" />
+		<result property="hotDetail" column="hot_detail" />	
+		<result property="hotAddr" column="hot_addr" />		
+		<result property="hotOpen" column="hot_open" />
+		<result property="hotTel" column="hot_tel" />
+		<result property="hotLat" column="hot_lat" />
+		<result property="hotLng" column="hot_lng" />
+		<result property="hotRegdate" column="hot_regdate" />
+		<result property="hotIson" column="hot_ison" />
+		<result property="hotCity" column="hot_city" />
+		<result property="hotPlaceId" column="hot_placeid" />
+		<!-- hot_categories -->
+		<result property="hotCateName" column="hot_cate_name" />
+		<!-- hot_scraps -->	
+		<result property="hotScrPk" column="hot_scr_pk" />
+		<result property="hotScrRegdate" column="hot_scr_regdate" />	
+		<!--  hot_pics -->	
+		<result property="hotPicPk" column="hot_pic_pk" />
+		<result property="hotPicUrl" column="hot_pic_url" />
+		<result property="hotPicRegdate" column="hot_pic_regdate" />
+		<result property="hotPicIsmain" column="hot_pic_ismain" />	
+		<!-- monsters -->
+		<result property="monPk" column="mon_pk" />
+		<result property="monName" column="mon_name" />
+		<result property="monEmail" column="mon_email" />
+		<result property="monBirthday" column="mon_birthday" />
+		<result property="monSex" column="mon_sex" />
+		<result property="monTel" column="mon_tel" />
+		<result property="monActivate" column="mon_activate" />
+		<result property="monCharged" column="mon_charged" />
+		<result property="monRegdate" column="mon_regdate" />
+		<result property="monProfile" column="mon_profile" />
+		<result property="monLoveball" column="mon_loveball" />
+		<result property="monIntro" column="mon_intro" />
+		<result property="monToken" column="mon_token" />
+		<result property="monId" column="mon_id" />
+		<!-- hot_reviews -->
+		<result property="hotRevPk" column="hot_rev_pk" />
+		<result property="hotRevCon" column="hot_rev_con" />
+		<result property="hotRevServiceRating" column="hot_rev_service_rating" />
+		<result property="hotRevRegdate" column="hot_rev_regdate" />
+		<result property="hotCostRating" column="hot_cost_rating" />		
+		<!-- custom -->
+		<result property="avgRating" column="avg_rating" />
+		<result property="totalReviewer" column="total_reviewer" />
+		<result property="rnum" column="rnum" />
+		<result property="costCnt5" column="cost_cnt5" />
+		<result property="costCnt4" column="cost_cnt4" />
+		<result property="costCnt3" column="cost_cnt3" />
+		<result property="costCnt2" column="cost_cnt2" />
+		<result property="costCnt1" column="cost_cnt1" />
+		
+	</resultMap>
+
+
+	
+
+
+<!-- 관광지 디테일 페이지 개별쿼리  -->
+<select id="detailSpot" parameterType="com.kosmo.alone.vo.HotspotsVO" resultMap="hotspotsListMap" >
+select hsp.hot_pk, hsp.hot_name, hsp.hot_detail, hsp.hot_addr, hsp.hot_open,hsp.hot_tel, hsp.hot_lat, hsp.hot_lng, hsp.hot_placeid
+from hotspots hsp
+where hot_pk = #{hotPk}
+</select>
+
+<select id="detailScrap" parameterType="com.kosmo.alone.vo.HotspotsVO" resultMap="hotspotsListMap" >
+select hscrap.hot_scr_pk, hscrap.mon_pk
+from hot_scraps hscrap
+where hot_pk = #{hotPk} and mon_pk = #{monPk}
+
+</select>
+
+<select id="detailPic" parameterType="com.kosmo.alone.vo.HotspotsVO" resultMap="hotspotsListMap" >
+select hp.hot_pic_pk, hp.hot_pic_url
+from hot_pics hp
+where hot_pk = #{hotPk}
+order by hp.hot_pic_pk
+</select>
+
+<select id="detailReview" parameterType="com.kosmo.alone.vo.HotspotsVO" resultMap="hotspotsListMap" >
+select hr.hot_rev_pk, hr.hot_pk, hr.mon_pk, hr.hot_rev_con, hr.hot_cost_rating, hr.hot_rev_service_rating,
+m.mon_name, m.mon_email, m.mon_profile
+from hot_reviews hr left outer join monsters m on hr.mon_pk = m.mon_pk
+where hr.hot_pk = #{hotPk}
+order by hr.hot_rev_regdate desc
+</select>
+
+<select id="detailReviewCostCnt" parameterType="com.kosmo.alone.vo.HotspotsVO" resultMap="hotspotsListMap" >
+select
+(select count(*) from hot_reviews where hot_pk = #{hotPk} and hot_cost_rating = 5)  as cost_cnt5,
+(select count(*) from hot_reviews where hot_pk = #{hotPk} and hot_cost_rating = 4) as cost_cnt4,
+(select count(*)  from hot_reviews where hot_pk = #{hotPk} and hot_cost_rating = 3) as cost_cnt3,
+(select count(*) from hot_reviews where hot_pk = #{hotPk} and hot_cost_rating = 2)  as cost_cnt2,
+(select count(*)  from hot_reviews where hot_pk = #{hotPk} and hot_cost_rating = 1) as cost_cnt1
+from dual
+</select>
+
+
+
+<!-- 리스트 페이지. 페이징 유틸용 카운터 -->
+<select id ="hotSpotCount" parameterType="com.kosmo.alone.vo.HotspotsVO" resultType="int">
+select count(*) count
+from hotspots
+where hot_city = #{hotCity}   and hot_cate_seq = #{hotCateSeq} 
+</select>
+	
+
+
+<!-- 관광지 리스트페이지. 필요 pram = monPk, hotCity, hotCateSeq, sseq, eseq -->
+<select id="hotSpotList" parameterType="com.kosmo.alone.vo.HotspotsVO" resultMap="hotspotsListMap" >
+<!-- mon_pk=? sseq=? eseq =? hot_city =? hot_cate_seq = ? -->
+ select rnum, hot_pk , hot_name, 
+hot_pic_pk, hot_pic_url, hot_pic_regdate, hot_pic_ismain,
+hot_scr_pk, 
+avg_rating, total_reviewer
+from
+(
+select rownum rnum, hsp.hot_pk ,  hsp.hot_name, 
+hp.hot_pic_pk, hp.hot_pic_url, hp.hot_pic_regdate, hp.hot_pic_ismain,
+t3.hot_scr_pk,
+rcv.avg_rating, rcv.total_reviewer
+from hotspots hsp 
+inner join hot_pics hp on hp.hot_pk = hsp.hot_pk 
+inner join review_cost_view rcv on rcv.hot_pk = hsp.hot_pk 
+left outer join
+(select hsp.hot_pk, 
+hscrap.hot_scr_pk
+from hotspots hsp left outer join hot_scraps hscrap 
+on hsp.hot_pk = hscrap.hot_pk
+where hscrap.mon_pk = #{monPk}
+order by hot_pk  ) t3 
+
+on hsp.hot_pk = t3.hot_pk
+
+where hsp.hot_city = #{hotCity} and hsp.hot_cate_seq = #{hotCateSeq} and hp.hot_pic_ismain = 1 and hsp.hot_ison=1 
+order by hsp.hot_pk
+)last_t
+where rnum between #{sseq} and  #{eseq}
+order by hot_pk
+
+
+</select>
+
+<!-- where hsp.hot_city = #{hotCity} and hsp.hot_cate_seq = #{hotCateSeq} and hp.hot_pic_ismain = 1 -->
+
+
+
+<insert id = "insertScrap" parameterType="com.kosmo.alone.vo.HotspotsVO">
+insert into hot_scraps(hot_scr_pk, hot_pk, mon_pk, hot_scr_regdate) values (hot_scr_pk.nextval, #{hotPk} ,#{monPk}, sysdate)
+</insert>
+
+<delete id = "deleteScrap" parameterType="com.kosmo.alone.vo.HotspotsVO">
+delete hot_scraps where hot_pk = #{hotPk} and mon_pk = #{monPk}
+</delete>
+
+
+
+<!-- 리뷰 인서트 후 방금 작성한 리뷰 출력 -->
+<insert id = "revInsert" parameterType="com.kosmo.alone.vo.HotReviewsVO">
+insert into hot_reviews(hot_rev_pk, hot_pk , mon_pk , hot_rev_con, hot_rev_regdate, hot_cost_rating) values (hot_rev_pk.nextval, #{hotPk}, #{monPk}, #{hotRevCon}, sysdate, #{hotCostRating})
+</insert>
+<select id = "findRevCurrvall" resultType = "int">
+select hot_rev_pk.currval from dual
+</select>
+<select id = "myRevSelect" parameterType="com.kosmo.alone.vo.HotReviewsVO" resultMap="hotReviewsMap" >
+select hr.hot_rev_pk, hr.hot_pk, hr.mon_pk, hr.hot_rev_con, hr.hot_rev_service_rating, hr.hot_rev_regdate, hr.hot_cost_rating,
+m.mon_name,  m.mon_profile
+from hot_reviews hr, monsters m where hr.mon_pk = m.mon_pk
+and hot_rev_pk =  #{hotRevPk}
+</select>
+
+
+<delete id = "revDelete" parameterType="com.kosmo.alone.vo.HotReviewsVO">
+delete hot_reviews where hot_rev_pk = #{hotRevPk}
+</delete>
+
+<select id="monInfo" resultMap="MonstersMap" parameterType="com.kosmo.alone.vo.MonstersVO"> select mon_pk , mon_name, mon_email, mon_birthday, mon_sex, mon_tel, mon_activate, mon_charged, mon_profile, mon_loveball, mon_intro, mon_token, mon_id from monsters where mon_pk = #{monPk} </select>
+
+<select id="scrapListPage" resultMap="hotspotsListMap" parameterType="com.kosmo.alone.vo.MonstersVO"> 
+select hsp.hot_pk , hsp.hot_cate_seq, hsp.hot_name, hsp.hot_detail, hsp.hot_addr, hsp.hot_open,hsp.hot_tel, hsp.hot_lat, hsp.hot_lng, hsp.hot_regdate, hsp.hot_ison, hsp.hot_city,hsp.hot_placeid, 
+hp.hot_pic_pk, hp.hot_pic_url, hp.hot_pic_regdate, hp.hot_pic_ismain, 
+hscrap.hot_scr_pk, hscrap.mon_pk, hscrap.hot_scr_regdate 
+from hotspots hsp , hot_pics hp, hot_scraps hscrap 
+where hsp.hot_pk = hp.hot_pk and hsp.hot_pk = hscrap.hot_pk 
+and mon_pk = #{monPk} and hot_pic_ismain = 1 
+</select>	
+
+
+
+<select id = "crawlSelect" resultMap="hotspotsListMap" parameterType = "com.kosmo.alone.vo.HotspotsVO">
+select hot_pk , hot_placeid from hotspots where hot_pk = #{hotPk}
+</select>
+
+<insert id = "crawlInsert" parameterType = "com.kosmo.alone.vo.HotspotsVO">
+insert into hot_reviews (hot_rev_pk, hot_pk , mon_pk ,hot_rev_con, hot_cost_rating , hot_rev_regdate) 
+values (hot_rev_pk.nextval,#{hotPk}, #{monPk},#{hotRevCon},#{hotCostRating},sysdate )
+</insert>
+
+
+
+
+
+
+
+
+
+
+</mapper>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kosmo.alone.mapper.DeHeeMapper">
+
+<resultMap id="hotMap" type="com.kosmo.alone.vo.HotspotsVO">
+	<result property="hotPk" column="hot_pk"/>
+	<result property="hotName" column="hot_name"/>
+	<result property="hotAddr" column="hot_addr"/>
+	<result property="hotLat" column="hot_lat"/>
+	<result property="hotLng" column="hot_lng"/>
+</resultMap>
+
+<resultMap id="hotRouMap" type="com.kosmo.alone.vo.HotRoutesVO">
+	<result property="hotRouPk" column="hot_rou_pk"/>
+	<result property="hotPk" column="hot_pk"/>
+	<result property="rouPk" column="rou_pk"/>
+	<result property="hotRouRegdate" column="hot_rou_regdate"/>
+	<result property="rouOrder" column="hot_order"/>
+</resultMap>
+
+<resultMap id="rouMap" type="com.kosmo.alone.vo.RoutesVO">
+  <result property="rouPk" column="rou_pk"/>
+  <result property="rouName" column="rou_name"/>
+  <result property="rouRegdate" column="rou_regdate"/>
+  <result property="rouImg" column="rou_img"/>
+  <result property="rouDetail" column="rou_detail"/>
+  <result property="rouView" column="rou_view"/>
+</resultMap>
+
+<resultMap id="routeViewMap" type="com.kosmo.alone.vo.RoutesViewVO">
+  <result property="hotRouPk" column="hot_rou_pk"/>
+  <result property="hotPk" column="hot_pk"/>
+  <result property="hotName" column="hot_name"/>
+  <result property="hotAddr" column="hot_addr"/>
+  <result property="hotLat" column="hot_lat"/>
+  <result property="hotLng" column="hot_lng"/>
+  <result property="hotCateSeq" column="hot_cate_seq"/>
+  <result property="hotCateName" column="hot_cate_name"/>
+  <result property="hotIson" column="hot_ison"/>
+  <result property="hotCity" column="hot_city"/>
+  <result property="hotPlaceid" column="hot_placeid"/>
+  <result property="rouPk" column="rou_pk"/>
+  <result property="rouName" column="rou_name"/>
+  <result property="rouImg" column="rou_img"/>
+  <result property="rouDetail" column="rou_detail"/>
+  <result property="hotRouRegdate" column="hot_rou_regdate"/>
+  <result property="hotOrder" column="hot_order"/>
+  <result property="hotPicUrl" column="hot_pic_url"/>
+</resultMap>
+	
+<select id="hotList" resultMap="hotMap">
+	select hot_pk, hot_name, hot_addr, hot_lat, hot_lng from hotspots
+</select>
+
+<select id="routeList" resultMap="rouMap">	
+	select r.rou_pk, r.rou_name, r.rou_regdate, r.rou_img, r.rou_detail, r.rou_view from routes r, (select count(hot_pk) cnt, rou_pk from hot_routes group by rou_pk) hr where r.rou_pk=hr.rou_pk(+) and NVL(hr.cnt, 0)<![CDATA[>]]>0 order by r.rou_regdate
+</select>
+
+<select id="noRouteList" resultMap="rouMap">	
+	select r.rou_pk, r.rou_name, r.rou_regdate, r.rou_img, r.rou_detail, r.rou_view from routes r, (select count(hot_pk) cnt, rou_pk from hot_routes group by rou_pk) hr where r.rou_pk=hr.rou_pk(+) and NVL(hr.cnt, 0)<![CDATA[<]]>1 order by r.rou_regdate
+</select>
+
+<select id="getRoute" parameterType="int" resultMap="rouMap">
+	select rou_pk, rou_name, rou_regdate, rou_img, rou_detail, rou_view from routes where rou_pk=#{rouPk}
+</select>
+
+<select id="routeViewList" parameterType="int" resultMap="routeViewMap">
+	select hot_rou_pk, hot_pk, hot_name, hot_addr, hot_lat, hot_lng, hot_cate_seq, hot_cate_name, hot_ison, hot_city, hot_placeid, rou_pk, rou_name, rou_img, rou_detail, hot_rou_regdate, hot_order, hot_pic_url from routes_view where rou_pk=#{rouPk} order by hot_order
+</select>
+
+<insert id="routeInsert" parameterType="com.kosmo.alone.vo.RoutesVO">
+	insert into routes values(rou_pk.nextval , #{rouName}, sysdate, #{rouImg}, #{rouDetail}, 0)
+</insert>
+
+<insert id="hotRouteInsert" parameterType="com.kosmo.alone.vo.HotRoutesVO">
+	insert into hot_routes values(hot_rou_pk.nextval, #{hotPk}, #{rouPk}, sysdate, #{rouOrder})
+</insert>
+
+<insert id="spotInsert" parameterType="com.kosmo.alone.vo.HotspotsVO">
+	insert into hotspots values(hot_pk.nextval, #{hotCateSeq}, #{hotName}, #{hotDetail}, #{hotAddr}, #{hotOpen}, #{hotTel}, #{hotLat}, #{hotLng}, sysdate, 1, #{hotCity}, #{hotPlaceId})
+</insert>
+
+<update id="routeReviewUpdate" parameterType="com.kosmo.alone.vo.RoutesVO">
+	update routes set rou_view=#{rouView} where rou_pk=#{rouPk}
+</update>
+
+<delete id="routeDelete" parameterType="com.kosmo.alone.vo.RoutesVO">
+	delete from routes where rou_pk=#{rouPk}
+</delete>
+
+<delete id="hotRouteDelete" parameterType="com.kosmo.alone.vo.RoutesVO">
+	delete from hot_routes where rou_pk=#{rouPk}
+</delete>
+
+</mapper>

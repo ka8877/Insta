@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.kosmo.alone.mapper.InYeeMapper">
+	<resultMap type="com.kosmo.alone.vo.MonstersVO" id="MonstersVO">
+		<result column="mon_pk" property="monPk"/>
+		<result column="mon_name" property="monName"/>
+		<result column="mon_email" property="monEmail"/>
+		<result column="mon_birthday" property="monBirthday"/>
+		<result column="mon_sex" property="monSex"/>
+		<result column="mon_tel" property="monTel"/>
+		<result column="mon_activate" property="monActivate"/>
+		<result column="mon_charged" property="monCharged"/>
+		<result column="mon_regdate" property="monRegdate"/>
+		<result column="mon_profile" property="monProfile"/>
+		<result column="mon_loveball" property="monLoveball"/>
+		<result column="mon_intro" property="monIntro"/>
+		<result column="mon_token" property="monToken"/>
+		<collection property="currentLocVO" resultMap="CurrentLocVO"/>
+		<collection property="destinationVO" resultMap="DestinationVO"/>
+		<collection property="likesVO" resultMap="LikesVO"/>
+	</resultMap>
+	
+	<resultMap type="com.kosmo.alone.vo.CurrentLocVO" id="CurrentLocVO">
+		<result column="cur_pk" property="curPk"/>
+		<result column="mon_pk" property="monPk"/>
+		<result column="cur_lat" property="curLat"/>
+		<result column="cur_lng" property="curLng"/>
+		<result column="cur_regdate" property="curRegdate"/>
+		<result column="cur_ison" property="curIson"/>
+	</resultMap>
+	
+	<resultMap type="com.kosmo.alone.vo.DestinationVO" id="DestinationVO">
+		<result column="des_pk" property="desPk"/>
+		<result column="mon_pk" property="monPk"/>
+		<result column="des_name" property="desName"/>
+		<result column="des_lat" property="desLat"/>
+		<result column="des_lng" property="desLng"/>
+		<result column="des_date_in" property="desDateIn"/>
+		<result column="des_regdate" property="desRegdate"/>
+		<result column="des_date_out" property="desDateOut"/>
+	</resultMap>
+	
+	<resultMap type="com.kosmo.alone.vo.LikesVO" id="LikesVO">
+		<result column="like_pk" property="likePk"/>
+		<result column="mon_pk" property="monPk"/>
+		<result column="like_object" property="likeObject"/>
+		<result column="like_regdate" property="likeRegdate"/>
+		<result column="like_cnt" property="likeCnt"/>
+		<result column="is_matched" property="isMatched"/>
+	</resultMap>
+	
+	<resultMap type="com.kosmo.alone.vo.MessagesVO" id="MessagesVO">
+		<result column="mes_pk" property="mesPk"/>
+		<result column="mon_pk" property="monPk"/>
+		<result column="mes_receiver" property="mesReceiver"/>
+		<result column="mes_con" property="mesCon"/>
+		<result column="mes_regdate" property="mesRegdate"/>
+		<result column="mes_is_matched" property="mesIsMatched"/>
+		<result column="mes_is_read" property="mesIsRead"/>
+		<result column="unread" property="unread"/>
+		<collection property="monstersVO" resultMap="MonstersVO"/>
+	</resultMap>
+	
+	<resultMap type="com.kosmo.alone.vo.ProductsVO" id="ProductsVO">
+		<result column="pro_pk" property="proPk"/>
+		<result column="pro_name" property="proName"/>
+		<result column="pro_detail" property="proDetail"/>
+		<result column="pro_price" property="proPrice"/>
+		<result column="pro_regdate" property="proRegdate"/>
+	</resultMap>
+
+	<resultMap type="com.kosmo.alone.vo.PaymentsVO" id="PaymentsVO">
+		<result column="pay_pk" property="payPk"/>
+		<result column="mon_pk" property="monPk"/>
+		<result column="pro_pk" property="proPk"/>
+		<result column="pay_regdate" property="payRegdate"/>
+	</resultMap>
+	
+	
+	<!-- Community Main List -->
+	<select id="personalInfo" resultMap="MonstersVO">
+		select 
+    		mon_pk, mon_name, mon_email, mon_birthday, mon_sex, mon_tel, mon_activate, mon_charged, mon_regdate, mon_profile, mon_loveball, mon_intro, mon_token, mon_id, 
+			des_pk, des_name, des_lat, des_lng, des_date_in, des_regdate, des_date_out, cur_pk, cur_regdate, cur_lat, cur_lng, cur_ison, like_cnt
+		from mon_des_cur_like
+		where mon_pk = #{monPk}
+	</select>
+	
+	<select id="curUserList" resultMap="MonstersVO">
+		select 
+			*
+		from
+			(select 
+					rownum as rnum,
+					cdul.mon_pk, cdul.mon_name, cdul.mon_email, cdul.mon_birthday, cdul.mon_sex, cdul.mon_tel, cdul.mon_activate, cdul.mon_charged, cdul.mon_regdate, cdul.mon_profile, cdul.mon_loveball, cdul.mon_intro, cdul.mon_token, cdul.mon_id, 
+					cdul.des_pk, cdul.des_name, cdul.des_lat, cdul.des_lng, to_char(cdul.des_date_in, 'YYYY/MM/DD') as des_date_in, cdul.des_regdate, to_char(cdul.des_date_out, 'YYYY/MM/DD') as des_date_out, cdul.cur_pk, cdul.cur_regdate, cdul.cur_lat, cdul.cur_lng, cdul.cur_ison, cdul.like_cnt, im.is_matched
+			from
+				mon_des_cur_like cdul 
+			left outer join
+				(select
+                    like_pk, mon_pk, like_object, like_regdate, decode(nvl(ism.is_matched,0), 0, 'n', 'y') as is_matched
+                from likes l
+                left outer join
+                    (select like_object as is_matched from likes where like_object in (select mon_pk from likes where like_object = #{monPk})) ism
+                on l.like_object = ism.is_matched
+                where l.mon_pk = #{monPk})im
+			on cdul.mon_pk = im.like_object
+			where cdul.mon_pk != #{monPk})
+		where rnum between #{sseq} and #{eseq}
+	</select>
+	
+	<select id="curUserTotal" resultType="Integer">
+		select 
+			count(1) as total
+		from
+			(select 
+				cdul.mon_pk, cdul.mon_name, cdul.mon_email, cdul.mon_birthday, cdul.mon_sex, cdul.mon_tel, cdul.mon_activate, cdul.mon_charged, cdul.mon_regdate, cdul.mon_profile, cdul.mon_loveball, cdul.mon_intro, cdul.mon_token, cdul.mon_id, 
+				cdul.des_pk, cdul.des_name, cdul.des_lat, cdul.des_lng, cdul.des_date_in, cdul.des_regdate, cdul.des_date_out, cdul.cur_pk, cdul.cur_regdate, cdul.cur_lat, cdul.cur_lng, cdul.cur_ison, cdul.like_cnt, nvl(im.is_matched,0) as is_matched
+			from
+				mon_des_cur_like cdul 
+			left outer join
+				(select
+                    like_pk, mon_pk, like_object, like_regdate, decode(nvl(ism.is_matched,0), 0, 'n', 'y') as is_matched
+                from likes l
+                left outer join
+                    (select like_object as is_matched from likes where like_object in (select mon_pk from likes where like_object = #{monPk})) ism
+                on l.like_object = ism.is_matched
+                where l.mon_pk = #{monPk})im
+			on cdul.mon_pk = im.like_object
+			where cdul.cur_lat = #{curLat} and cdul.cur_lng = #{curLng} and cdul.mon_pk! = #{monPk})
+	</select>
+	
+	<select id="sameDestination" resultMap="MonstersVO">
+		select 
+				*
+		from
+			(select 
+				rownum as rnum,
+				cdul.mon_pk, cdul.mon_name, cdul.mon_email, cdul.mon_birthday, cdul.mon_sex, cdul.mon_tel, 
+	            cdul.mon_activate, cdul.mon_charged, cdul.mon_regdate, cdul.mon_profile, 
+				cdul.mon_loveball, cdul.mon_intro, cdul.mon_token, cdul.mon_id, 
+				cdul.des_pk, cdul.des_name, cdul.des_lat, cdul.des_lng, to_char(cdul.des_date_in, 'YYYY/MM/DD') 
+	            as des_date_in, cdul.des_regdate, to_char(cdul.des_date_out, 'YYYY/MM/DD') 						
+	            as des_date_out, cdul.cur_pk, cdul.cur_regdate, cdul.cur_lat, cdul.cur_lng, cdul.cur_ison, cdul.like_cnt, im.is_matched
+			from
+				mon_des_cur_like cdul 
+			left outer join
+				(select
+	          		like_pk, mon_pk, like_object, like_regdate, decode(nvl(ism.is_matched,0), 0, 'n', 'y') as is_matched
+	        	from 
+	        		likes l
+	            left outer join
+	               	(select like_object as is_matched from likes where like_object in (select mon_pk from likes where like_object = #{monPk})) ism
+	            on l.like_object = ism.is_matched
+	            where l.mon_pk = #{monPk})im
+			on cdul.mon_pk = im.like_object
+	        where cdul.mon_pk != #{monPk}
+	        and cdul.des_name = #{desName}
+	        and cdul.des_date_in between to_date(#{desDateIn}, 'YYYY/MM/DD') and to_date(#{desDateOut}, 'YYYY/MM/DD')
+	        and cdul.des_date_out between to_date(#{desDateIn}, 'YYYY/MM/DD') and to_date(#{desDateOut}, 'YYYY/MM/DD'))
+	    where rnum between #{sseq} and #{eseq}
+	</select>
+	
+	<select id="sameDestinationCount" resultType="Integer">
+		select 
+				count(1) as total
+		from
+			(select 
+				rownum as rnum,
+				cdul.mon_pk, cdul.mon_name, cdul.mon_email, cdul.mon_birthday, cdul.mon_sex, cdul.mon_tel, 
+	            cdul.mon_activate, cdul.mon_charged, cdul.mon_regdate, cdul.mon_profile, 
+				cdul.mon_loveball, cdul.mon_intro, cdul.mon_token, cdul.mon_id, 
+				cdul.des_pk, cdul.des_name, cdul.des_lat, cdul.des_lng, to_char(cdul.des_date_in, 'YYYY/MM/DD') 
+	            as des_date_in, cdul.des_regdate, to_char(cdul.des_date_out, 'YYYY/MM/DD') 						
+	            as des_date_out, cdul.cur_pk, cdul.cur_regdate, cdul.cur_lat, cdul.cur_lng, cdul.cur_ison, cdul.like_cnt, im.is_matched
+			from
+				mon_des_cur_like cdul 
+			left outer join
+				(select
+	          		like_pk, mon_pk, like_object, like_regdate, decode(nvl(ism.is_matched,0), 0, 'n', 'y') as is_matched
+	        	from 
+	        		likes l
+	            left outer join
+	               	(select like_object as is_matched from likes where like_object in (select mon_pk from likes where like_object = #{monPk})) ism
+	            on l.like_object = ism.is_matched
+	            where l.mon_pk = #{monPk})im
+			on cdul.mon_pk = im.like_object
+	        where cdul.mon_pk != #{monPk}
+	        and cdul.des_name = #{desName}
+	        and cdul.des_date_in between to_date(#{desDateIn}, 'YYYY/MM/DD') and to_date(#{desDateOut}, 'YYYY/MM/DD')
+	        and cdul.des_date_out between to_date(#{desDateIn}, 'YYYY/MM/DD') and to_date(#{desDateOut}, 'YYYY/MM/DD'))
+	</select>
+
+	<!-- Like Event -->
+	<insert id="insertLike">
+		insert into likes(like_pk, mon_pk, like_object, like_regdate) values (like_pk.nextval, #{monPk},  #{likeObject}, sysdate)
+	</insert>
+	
+	<delete id="deleteLike">
+		delete from likes where mon_pk = #{monPk} and like_object = #{likeObject}
+	</delete>
+	
+	<select id="checkLike" resultType="Integer">
+		select
+  			count(1) as is_match
+		from
+   			(select mon_pk, like_object from likes where mon_pk = #{likeObject})l
+		where 
+   			l.like_object=#{monPk}
+	</select>
+	
+	<!-- Purchase -->
+	<select id="countLoveball" resultMap="MonstersVO">
+		select mon_pk, mon_loveball from monsters where mon_pk = #{monPk}
+	</select>
+	<select id="productList" resultMap="ProductsVO">
+		select pro_pk, pro_name, pro_detail, pro_price, pro_regdate from products
+	</select>
+	<insert id="insertPayments">
+		insert into payments (pay_pk, mon_pk, pro_pk, pay_regdate) values (pay_pk.nextval, #{monPk}, #{proPk}, sysdate)
+	</insert>
+	<select id="paidProduct" resultMap="ProductsVO">
+		select pro_pk, pro_name, pro_detail, pro_price, pro_regdate from products where pro_pk = #{proPk}
+	</select>
+	<update id="updateLoveball">
+		update monsters set mon_loveball = #{cnt} , mon_charged = 1 where mon_pk = #{monPk}
+	</update>
+	<update id="minusLoveball">
+		 update monsters set (mon_loveball) = (select mon_loveball-1 from monsters where mon_pk = #{monPk}) where mon_pk = #{monPk}
+	</update>
+	<update id="changeCharged">
+		update monsters set mon_charged = 0 where mon_pk = #{monPk}
+	</update>
+	
+	<!-- Messages -->
+	<select id="msgList" resultMap="MessagesVO">
+		select 
+			m1.mes_receiver, m1.mon_name, m1.mon_profile, m1.mes_is_matched, nvl(m2.unread, 0) as unread
+		from 
+			(select  
+            	distinct me.mes_receiver, me.mes_is_matched, mo.mon_name, mo.mon_profile
+			from 
+    			messages me 
+			left outer join
+    			monsters mo
+			on me.mes_receiver = mo.mon_pk
+			where me.mon_pk = #{monPk})m1 
+		left outer join
+			(select 
+				mon_pk, count(1) as unread from messages
+       		where mes_is_read = 0
+        	and mes_receiver = #{monPk}
+        	group by mon_pk)m2
+		on m1.mes_receiver = m2.mon_pk
+		where m1.mes_is_matched = 1
+	</select>
+	
+	<insert id="insertGreeting">
+		insert into messages(mes_pk, mon_pk, mes_receiver, mes_con, mes_regdate, mes_is_matched, mes_is_read) 
+		values (mes_pk.nextval, #{monPk}, #{likeObject}, '[SYSTEM] 친구에게 인사해보세요!', sysdate, 1, 1)
+	</insert>
+	
+	<select id="selectMessages" resultMap="MessagesVO">
+		select 
+			mes_pk,
+			mon_pk,
+			mes_receiver,
+			mes_con,
+			to_char(mes_regdate,'YY/MM/DD HH24:MI') as mes_regdate,
+			mes_is_matched,
+			mes_is_read
+		from 
+			messages
+		where 
+			(mon_pk = #{monPk} or mon_pk= #{mesReceiver}) 
+		and (mes_receiver = #{mesReceiver} or mes_receiver = #{monPk})
+		order by mes_regdate
+	</select>
+	
+	<insert id="insertMsg">
+		insert into messages(mes_pk, mon_pk, mes_receiver, mes_con, mes_regdate, mes_is_matched, mes_is_read) 
+		values (mes_pk.nextval, #{monPk}, #{mesReceiver}, #{mesCon}, sysdate, 1, 0)
+	</insert>
+	
+	<update id="updateUnread">
+		update messages set mes_is_read = 1 where mon_pk = #{mesReceiver} and mes_receiver = #{monPk}
+	</update>
+	
+	<update id="deleteMsg">
+		update messages set mes_is_matched = 0 where mon_pk = #{monPk} and mes_receiver = #{mesReceiver}
+	</update>
+	
+	<!-- Current Location -->
+	<insert id="insertCurrent">
+		insert into current_loc(cur_pk, mon_pk, cur_lat, cur_lng, cur_regdate, cur_ison)
+		values (cur_pk.nextval, #{monPk}, #{curLat}, #{curLng}, sysdate, 1)
+	</insert>
+</mapper>
+
+
+
